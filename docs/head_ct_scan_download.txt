@@ -1,0 +1,2 @@
+wget -i cq500_files.txt # If you have wget
+aria2c -x5 -i cq500_files.txt # If you have aria2, recommended
