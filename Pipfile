@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+black = "*"
+jupyter = "*"
+
+[packages]
+requests = "*"
+pandas = "*"
+scikit-learn = "*"
+keras = "*"
+tensorflow = "*"
+numpy = "*"
+pydicom = "*"
+
+[requires]
+python_version = "3.7"
