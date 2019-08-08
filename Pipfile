@@ -16,6 +16,7 @@ keras = "*"
 tensorflow = "*"
 numpy = "*"
 pydicom = "*"
+scikit-image = "*"
 
 [requires]
 python_version = "3.7"
