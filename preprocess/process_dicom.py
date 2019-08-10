@@ -1,93 +1,79 @@
 import pydicom
 import os
-
 import numpy as np
-import scipy.ndimage
 import matplotlib.pyplot as plt
 
-from skimage import measure, morphology
 
 INPUT_FOLDER = "/Users/jasonadam/Downloads/cv_medical/scans/"
-SCAN_PATH = "CQ500CT100 CQ500CT100/Unknown Study/CT Plain 3mm/"
-
-TEST_PATH = os.path.join(INPUT_FOLDER, SCAN_PATH)
-scans = os.listdir(TEST_PATH)
-patient_100 = os.listdir(os.path.join(TEST_PATH, scans[0]))
-patient_100.sort()
-
-patient_100
-
-all_scans = []
-for ct in os.listdir(INPUT_FOLDER):
-    list_scans = []
-    images_path = os.path.join(INPUT_FOLDER, ct + "/" + "Unknown Study/")
-    list_scans.append(os.listdir(images_path))
-    all_scans.append(list_scans)
-
-all_scans
 
 
-def load_scan(path: str):
-    slices = [pydicom.read_file(path + s) for s in os.listdir(path)]
-    slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
-    try:
-        slice_thickness = np.abs(
-            slices[0].ImagePositionPatient[2] - slices[1].ImagePositionPatient[2]
-        )
-    except:
-        slice_thickness = np.abs(slices[0].SliceLocation - slices[1].SliceLocation)
+def get_loaded_scans(base_path, slice_count: int = 256):
+    for ct in os.listdir(base_path):
+        images_path = os.path.join(base_path, ct + "/" + "Unknown Study/")
+        list_scans = os.listdir(images_path)
 
-    for s in slices:
-        s.SliceThickness = slice_thickness
-
-    return slices
-
-
-test_scan = load_scan(TEST_PATH)
-
-test_scan[0]
+        for scan_folders in list_scans:
+            slice_path = os.path.join(images_path, scan_folders + "/")
+            slices = os.listdir(slice_path)
+            if len(slices) != slice_count:
+                continue
+            else:
+                slices.sort()
+                yield list([pydicom.read_file(os.path.join(slice_path, s)) for s in slices])
 
 
-def get_pixels_hu(slices):
-    image = np.stack([s.pixel_array for s in slices])
-    # Convert to int16 (from sometimes int16),
-    # should be possible as values should always be low enough (<32k)
-    image = image.astype(np.int16)
-
-    # Set outside-of-scan pixels to 0
-    # The intercept is usually -1024, so air is approximately 0
-    image[image == -2000] = 0
-
-    # Convert to Hounsfield units (HU)
-    for slice_number in range(len(slices)):
-
-        intercept = slices[slice_number].RescaleIntercept
-        slope = slices[slice_number].RescaleSlope
-
-        if slope != 1:
-            image[slice_number] = slope * image[slice_number].astype(np.float64)
-            image[slice_number] = image[slice_number].astype(np.int16)
-
-        image[slice_number] += np.int16(intercept)
-
-    return np.array(image, dtype=np.int16)
+# test = get_loaded_scans(base_path=INPUT_FOLDER)
+# for patient in test:
+#     for i in patient:
+#         print(i.PatientName)
 
 
-pixes_hu = get_pixels_hu(test_scan)
-pixes_hu.shape
+def get_pixels_hu(slices: list):
+    for scans in slices:
+        try:
+            image = np.stack([s.pixel_array for s in scans])
+            image = image.astype(np.float)
+            # Set outside-of-scan pixels to 0
+            # The intercept is usually -1024, so air is approximately 0
+            image[image == -2000] = 0
 
-first_patient_pixels = pixes_hu
+            # Convert to Hounsfield units (HU)
+            for slice_number in range(len(scans)):
+
+                intercept = scans[slice_number].RescaleIntercept
+                slope = scans[slice_number].RescaleSlope
+
+                if slope != 1:
+                    image[slice_number] = slope * image[slice_number]
+
+                image[slice_number] += np.float(intercept)
+
+            yield np.array(image, dtype=np.float)
+        except OSError:
+            pass
+
+
+# test = get_loaded_scans(base_path=INPUT_FOLDER, slice_count=32)
+# arrays_test = get_pixels_hu(test)
+# for i in arrays_test:
+#     print(i.shape)
+
+
+
+
+
+# Sample Plotting
 plt.hist(first_patient_pixels.flatten(), bins=40, color="c")
 plt.xlabel("Hounsfield Units (HU)")
 plt.ylabel("Frequency")
 plt.show()
 
 # Show some slice in the middle
-plt.imshow(first_patient_pixels[19], cmap=plt.cm.gray)
+plt.imshow(first_patient_pixels[30], cmap=plt.cm.gray)
 plt.show()
 
 
-def sample_stack(stack, rows=10, cols=5, start_with=0, show_every=1):
+def sample_stack(stack, rows=6, cols=6, start_with=1, show_every=1):
     fig, ax = plt.subplots(rows, cols, figsize=[12, 12])
     for i in range(rows * cols):
         ind = start_with + i * show_every
@@ -95,3 +81,6 @@ def sample_stack(stack, rows=10, cols=5, start_with=0, show_every=1):
         ax[int(i / rows), int(i % rows)].imshow(stack[ind], cmap="gray")
         ax[int(i / rows), int(i % rows)].axis("off")
     plt.show()
+
+
+sample_stack(pixes_hu)
