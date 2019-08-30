@@ -9,6 +9,7 @@ import scipy.ndimage
 
 INPUT_FOLDER = "/Users/jasonadam/Downloads/cv_medical/scans/"
 SAVE_FOLDER = "/Users/jasonadam/Downloads/cv_medical/processed_arrays/"
+SAVE_FOLDER_TWO = "/Users/jasonadam/Downloads/cv_medical/processed_arrays_two/"
 LABELS_PATH = "/Users/jasonadam/Downloads/cv_medical/ich_reads.csv"
 
 
@@ -79,10 +80,10 @@ def main():
     test = get_loaded_scans(base_path=INPUT_FOLDER, slice_count=32)
     arrays_test = get_pixels_hu(test)
     for i, j in arrays_test:
-        normalized = scipy.ndimage.interpolation.zoom(i, (0.25, 0.25, 0.25), mode="nearest")
+        normalized = scipy.ndimage.interpolation.zoom(i, (1, 0.50, 0.50), mode="nearest")
         normalized = normalize_stacks(normalized)
         normalized = normalized - np.mean(normalized)
-        np.save(os.path.join(SAVE_FOLDER, j), normalized)
+        np.save(os.path.join(SAVE_FOLDER_TWO, j), normalized)
 
 
 if __name__ == "__main__":
