@@ -12,6 +12,5 @@ brew install wget
 ```
 Then run:
 ```bash
-wget -i docs/cq500_files.txt # If you have wget
-aria2c -x5 -i cq500_files.txt # If you have aria2, recommended
+wget -i docs/cq500_files.txt
 ```
