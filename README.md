@@ -1,4 +1,4 @@
-# Computer Vision Brain CT Scans  
+# Computer Vision - Brain CT Scans  
 Repo for a Computer Vision project to detect abnormatlities in brain CT scans.  
 Link to website and original study: [Qure.ai](http://headctstudy.qure.ai/#dataset)
 
