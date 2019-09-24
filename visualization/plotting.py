@@ -79,7 +79,6 @@ plot_test_pixels = test_patient_pixels[1:26]
 sample_stack(plot_test_pixels)
 
 
-
 def normalize(image, min_bound=-1000.0, max_bound=2000):
     image = (image - min_bound) / (max_bound - min_bound)
     image[image > 1] = 1
@@ -95,7 +94,7 @@ np.max(test_patient_pixels)
 np.min(test_patient_pixels)
 
 
-def resample(image, scan, new_spacing=[1,1,1]):
+def resample(image, scan, new_spacing=[1, 1, 1]):
     spacing = [float(scan[0].SliceThickness)]
     pixel_spacing = [float(i) for i in scan[0].PixelSpacing]
     for i in pixel_spacing:
@@ -108,9 +107,9 @@ def resample(image, scan, new_spacing=[1,1,1]):
     new_shape = np.round(new_real_shape)
     real_resize_factor = new_shape / image.shape
     new_spacing = spacing / real_resize_factor
-    
-    image = scipy.ndimage.interpolation.zoom(image, real_resize_factor, mode='nearest')
-    
+
+    image = scipy.ndimage.interpolation.zoom(image, real_resize_factor, mode="nearest")
+
     return image
 
 
@@ -119,15 +118,15 @@ resamp_test.shape
 
 
 def plot_3d(image, threshold=-300):
-    
-    # Position the scan upright, 
+
+    # Position the scan upright,
     # so the head of the patient would be at the top facing the camera
-    p = image.transpose(2,1,0)
-    
+    p = image.transpose(2, 1, 0)
+
     verts, faces = measure.marching_cubes(p, threshold)
 
     fig = plt.figure(figsize=(10, 10))
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.add_subplot(111, projection="3d")
 
     # Fancy indexing: `verts[faces]` to generate a collection of triangles
     mesh = Poly3DCollection(verts[faces], alpha=0.70)
@@ -140,4 +139,3 @@ def plot_3d(image, threshold=-300):
     ax.set_zlim(0, p.shape[2])
 
     plt.show()
-
