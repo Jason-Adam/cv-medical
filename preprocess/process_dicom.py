@@ -28,7 +28,7 @@ def most_common_slice_count():
     return counts.most_common(1)
 
 
-def get_loaded_scans(base_path: str, slice_count: int = 32) -> list:
+def get_loaded_scans(base_path: str, slice_count: int = 32):
     for ct in os.listdir(base_path):
         images_path = os.path.join(base_path, ct + "/" + "Unknown Study/")
         list_scans = os.listdir(images_path)
