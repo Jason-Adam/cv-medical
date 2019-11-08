@@ -40,9 +40,7 @@ def get_loaded_scans(base_path: str, slice_count: int = 32):
                 continue
             else:
                 slices.sort()
-                yield list(
-                    [pydicom.read_file(os.path.join(slice_path, s)) for s in slices]
-                )
+                yield list([pydicom.read_file(os.path.join(slice_path, s)) for s in slices])
 
 
 def get_pixels_hu(slices: list):
@@ -82,9 +80,7 @@ def main():
     test = get_loaded_scans(base_path=INPUT_FOLDER, slice_count=32)
     arrays_test = get_pixels_hu(test)
     for i, j in arrays_test:
-        normalized = scipy.ndimage.interpolation.zoom(
-            i, (1, 0.50, 0.50), mode="nearest"
-        )
+        normalized = scipy.ndimage.interpolation.zoom(i, (1, 0.50, 0.50), mode="nearest")
         normalized = normalize_stacks(normalized)
         normalized = normalized - np.mean(normalized)
         np.save(os.path.join(SAVE_FOLDER_TWO, j), normalized)
