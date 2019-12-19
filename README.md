@@ -13,4 +13,8 @@ brew install wget
 Then run:
 ```bash
 wget -i docs/cq500_files.txt
-```
+```  
+
+## DICOM  
+[DICOM](https://en.wikipedia.org/wiki/DICOM) images require different pre-processing than normal jpg or png files. The `pydicom` library is useful for this task. Below is a sample of one set of scans. After reading in the scans, they must be converted to a 3D numpy array.  
+![](visualization/sample_scan_grid.png)
